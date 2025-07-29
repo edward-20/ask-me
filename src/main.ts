@@ -1,6 +1,7 @@
 import './style.css'
 
 import * as THREE from "three";
+import gsap from 'gsap';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -52,29 +53,103 @@ function main() {
   loader.load(url, (gltf) => {
     const root = gltf.scene;
     scene.add(root);
+
+    const headMesh = root.getObjectByProperty('type', 'Mesh') as THREE.Object3D;
+    headMesh.userData.interactive = true;
   })
 
-  // clock
+  // hitbox
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  
+  let shouldPan = true;
+
+  function onMouseMove(event : MouseEvent) {
+    // Normalize mouse coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    // Check intersections with scene children
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    let thereIsHitbox = false;
+    for (let i = 0; i < intersects.length; i++) {
+      const object = intersects[i].object;
+      if (object.userData.interactive) {
+        thereIsHitbox = true;
+      }
+    }
+    document.body.style.cursor = thereIsHitbox ? 'pointer' : 'default';
+
+  }
+
+  function handleMouseDown(event: MouseEvent) {
+    // Normalize mouse coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    // Check intersections with scene children
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    for (let i = 0; i < intersects.length; i++) {
+      const object = intersects[i].object;
+      if (object.userData.interactive) {
+        // go to focus mode    
+        shouldPan = false;
+        gsap.to(camera.position, {
+          duration: 2,
+          x: 0.5,
+          y: 0,
+          z: -2,
+          ease: "power2.inOut",
+          onUpdate: () => {
+            camera.lookAt(0,0,0);
+          }
+        })
+      }
+    }
+  }
+
+  window.addEventListener('mousemove', onMouseMove, false);
+  window.addEventListener('mousedown', handleMouseDown, false)
+
+  // clock for dolly panning
   let clock = new THREE.Clock();
 
-  // animation loop callback
-  function animate() {
-    renderer.render(scene, camera);
-    
+  function pan() {
     // pan along x axis
     const t = clock.getElapsedTime();
     const amplitude = 0.5;
     const frequency = 0.1;
     camera.position.x = Math.sin(t * 2 * Math.PI * frequency) * amplitude;
     camera.lookAt(0,0,0);
+  }
+  // animation loop callback
+  function animate() {
+    renderer.render(scene, camera);
+    
     // angle += speed;
     // light.position.x = Math.cos(angle) * radius;
     // light.position.y = Math.sin(angle) * radius;
     // light.position.z = 0; // stays flat on XY plane
 
+    if (shouldPan) pan();
+
     controls.update();
     requestAnimationFrame(animate);
   }
   animate();
+
+  // need some way to account for window resizing
+  // window.addEventListener('resize', () => {
+  //   const width = window.innerWidth
+  //   const height = window.innerHeight
+  //   //update camera
+  //   camera.updateProjectionMatrix()
+  //   camera.aspect = width / height
+  //   renderer.setSize(width, height)
+  // })
 }
 main();
