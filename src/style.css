@@ -1,5 +1,9 @@
+@font-face {
+  font-family: "VCR OSD MONO";
+  src: url('/vcr_osd_mono/VCR_OSD_MONO_1.001.ttf')
+}
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'VCR OSD MONO', Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -26,8 +30,8 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
 }
 
 button {
@@ -40,7 +44,21 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  z-index: 99;
 }
+
+.info {
+  position: absolute;
+  z-index: 99;
+  background-color: white;
+  bottom: 20px;
+  padding: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  border-style: double;
+}
+
 button:hover {
   border-color: #646cff;
 }

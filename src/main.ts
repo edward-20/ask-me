@@ -100,7 +100,7 @@ function main() {
         shouldPan = false;
         gsap.to(camera.position, {
           duration: 2,
-          x: 0.5,
+          x: 0,
           y: 0,
           z: -2,
           ease: "power2.inOut",
