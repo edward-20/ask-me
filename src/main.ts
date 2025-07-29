@@ -20,17 +20,8 @@ function main() {
   const scene = new THREE.Scene()
  
   // light
-  const color = 0xFFFFFF;
-  const intensity = 3;
-  // const light = new THREE.AmbientLight(0x404040, 25);
-  // const light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
   const light = new THREE.AmbientLight(0x404040, 25);
-  // const light = new THREE.DirectionalLight(color, intensity);
-  // light.position.set(5, 0, 0);
   scene.add(light);
-
-  const axesHelper = new THREE.AxesHelper(5);
-  scene.add(axesHelper);
 
   // add orbit controls
   const controls = new OrbitControls( camera, renderer.domElement );
@@ -121,9 +112,10 @@ function main() {
   function pan() {
     // pan along x axis
     const t = clock.getElapsedTime();
-    const amplitude = 0.5;
-    const frequency = 0.1;
-    camera.position.x = Math.sin(t * 2 * Math.PI * frequency) * amplitude;
+    const radius = 3;
+    const speed = 0.1;
+    camera.position.x = Math.sin(t * 2 * Math.PI * speed) * radius;
+    camera.position.z = -Math.cos(t * 2 * Math.PI * speed) * radius;
     camera.lookAt(0,0,0);
   }
   // animation loop callback
