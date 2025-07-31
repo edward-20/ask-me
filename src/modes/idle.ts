@@ -1,54 +1,79 @@
 import * as THREE from "three";
 import type { Mode } from "../mode";
-import { div } from "three/tsl";
-export function handleHoverOverHead(
-  mouseEvent: MouseEvent, {mouse, camera} : MouseCamera, 
-  raycaster: THREE.Raycaster, 
-  scene: THREE.Scene
-) {
-  const intersection = _getIntersection(mouseEvent, {mouse, camera}, raycaster, scene)
-  let thereIsHitbox = false;
-  for (let i = 0; i < intersection.length; i++) {
-    const object = intersection[i].object;
-    if (object.userData.interactive) {
-      thereIsHitbox = true;
-    }
-  }
-  document.body.style.cursor = thereIsHitbox ? 'pointer' : 'default';
-}
-
-export function handleClickOnHead(
-  // Normalize mouse coordinates
-  mouseEvent: MouseEvent, {mouse, camera} : MouseCamera, 
-  raycaster: THREE.Raycaster, 
-  scene: THREE.Scene
-) {
-  const intersection = _getIntersection(mouseEvent, {mouse, camera}, raycaster, scene)
-  for (let i = 0; i < intersection.length; i++) {
-    const object = intersection[i].object;
-    if (object.userData.interactive) {
-      // go to conversation mode
-    }
-  }
-
-}
+import { typeWord } from "../typing";
 
 export class IdleMode implements Mode {
   angle = 0;
   speed = 0.2;
   radius = 3;
   camera: THREE.Camera;
+  mouse: THREE.Vector2;
+  raycaster: THREE.Raycaster;
+  scene: THREE.Scene;
 
-  constructor(camera : THREE.Camera) {
+  constructor(camera : THREE.Camera, mouse: THREE.Vector2, raycaster: THREE.Raycaster, scene: THREE.Scene) {
     this.camera = camera;
+    this.mouse = mouse;
+    this.raycaster = raycaster;
+    this.scene = scene;
   }
 
+  _getIntersection(
+    mouseevent: MouseEvent, mouse: THREE.Vector2, camera : THREE.Camera, 
+    raycaster: THREE.Raycaster, 
+    scene: THREE.Scene
+  ) {
+
+    const event = mouseevent;
+    // normalize mouse coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    // check intersections with scene children
+    return raycaster.intersectObjects(scene.children, true);
+  }
+
+  handleHoverOverHead(mouseEvent: MouseEvent) {
+    const intersection = this._getIntersection(mouseEvent, this.mouse, this.camera, this.raycaster, this.scene)
+    let thereIsHitbox = false;
+    for (let i = 0; i < intersection.length; i++) {
+      const object = intersection[i].object;
+      if (object.userData.interactive) {
+        thereIsHitbox = true;
+      }
+    }
+    document.body.style.cursor = thereIsHitbox ? 'pointer' : 'default';
+  }
+
+  handleClickOnHead(mouseEvent: MouseEvent) {
+    const intersection = this._getIntersection(mouseEvent, this.mouse, this.camera, this.raycaster, this.scene)
+    for (let i = 0; i < intersection.length; i++) {
+      const object = intersection[i].object;
+      if (object.userData.interactive) {
+        // go to conversation mode
+      }
+    }
+
+  }
+
+
   init() {
+    /* 
+      * what does init involve?
+        * initialising the angle, speed, radius and camera so that update() can use
+        * creating info element
+        * creating event listeners for mouse move and mouse down
+    */
+    // create info div element
     const divElement = document.createElement('div');
-    divElement.innerHTML = "Click on me to start conversation mode";
     divElement.className = "info";
     document.body.appendChild(divElement);
-    console.log('hello');
+    typeWord("Click on me to start asking questions", document.getElementsByClassName("info")[0]);
+
+    window.addEventListener('mousemove', this.handleHoverOverHead.bind(this), false);
+    window.addEventListener('mousedown', this.handleClickOnHead.bind(this), false)
     return;
   }
 
@@ -63,74 +88,16 @@ export class IdleMode implements Mode {
   dispose() {
     /* 
       * what does clearing involve?
-        * stopping any camera motion
+        * stopping any camera motion (maybe don't need to)
         * removing info
         * remove event listeners for mouse move and mouse down
     */
     // removing info
     document.getElementsByClassName("info")[0].remove();
+
+    // removing event listeners
+    document.removeEventListener("mousedown", this.handleClickOnHead);
+    document.removeEventListener("mouseover", this.handleClickOnHead);
     return;
   }
 }
-
-/*
-window.removeEventListener('mousedown', handleClickOnHead);
-
-// pans in non-conversation mode, doesn't pan in conversation mode
-let shouldPan = true;
-
-interface MouseCamera {
-  mouse: THREE.Vector2,
-  camera: THREE.Camera,
-}
-
-function _getIntersection(
-  mouseEvent: MouseEvent, {mouse, camera} : MouseCamera, 
-  raycaster: THREE.Raycaster, 
-  scene: THREE.Scene
-) {
-
-  const event = mouseEvent;
-  // Normalize mouse coordinates
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-
-  // Check intersections with scene children
-  return raycaster.intersectObjects(scene.children, true);
-}
-
-window.addEventListener('mousemove', handleHoverOverHead, false);
-window.addEventListener('mousedown', handleClickOnHead, false)
-
-// clock for dolly panning
-let clock = new THREE.Clock();
-
-function pan() {
-  // pan along x axis
-  const t = clock.getElapsedTime();
-  const radius = 3;
-  const speed = 0.1;
-  camera.position.x = Math.sin(t * 2 * Math.PI * speed) * radius;
-  camera.position.z = -Math.cos(t * 2 * Math.PI * speed) * radius;
-  camera.lookAt(0,0,0);
-}
-
-// animation loop callback
-function animate() {
-  renderer.render(scene, camera);
-  
-  // angle += speed;
-  // light.position.x = Math.cos(angle) * radius;
-  // light.position.y = Math.sin(angle) * radius;
-  // light.position.z = 0; // stays flat on XY plane
-
-  if (shouldPan) pan();
-
-  controls.update();
-  requestAnimationFrame(animate);
-}
-animate();
-typeWord("Click on me to start asking questions", document.getElementsByClassName("info")[0]);
-*/

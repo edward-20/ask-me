@@ -25,7 +25,7 @@ function main() {
 
   const clock = new THREE.Clock();
   const modeManager = new ModeManager();
-  const idleMode = new IdleMode(camera);
+  const idleMode = new IdleMode(camera, mouse, raycaster, scene);
   // const conversationMode = new ConversationMode(camera);
   modeManager.switchTo(idleMode);
 
