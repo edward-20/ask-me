@@ -25,7 +25,54 @@ function main() {
 
   const clock = new THREE.Clock();
   const modeManager = new ModeManager();
-  const idleMode = new IdleMode(camera, mouse, raycaster, scene);
+  
+  // construct event listener callbacks for idle mode
+  function _getIntersection(
+    mouseevent: MouseEvent, mouse: THREE.Vector2, camera : THREE.Camera, 
+    raycaster: THREE.Raycaster, 
+    scene: THREE.Scene
+  ) {
+
+    const event = mouseevent;
+    // normalize mouse coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    // check intersections with scene children
+    return raycaster.intersectObjects(scene.children, true);
+  }
+
+  function handleHoverOverHead(mouseEvent: MouseEvent) {
+    const intersection = _getIntersection(mouseEvent, mouse, camera, raycaster, scene)
+    let thereIsHitbox = false;
+    for (let i = 0; i < intersection.length; i++) {
+      const object = intersection[i].object;
+      if (object.userData.interactive) {
+        thereIsHitbox = true;
+      }
+    }
+    document.body.style.cursor = thereIsHitbox ? 'pointer' : 'default';
+  }
+
+  function handleClickOnHead(mouseEvent: MouseEvent) {
+    const intersection = _getIntersection(mouseEvent, mouse, camera, raycaster, scene)
+    for (let i = 0; i < intersection.length; i++) {
+      const object = intersection[i].object;
+      if (object.userData.interactive) {
+        // go to conversation mode
+        // modeManager.switchTo(conversationMode);
+      }
+    }
+  }
+
+
+  const idleMode = new IdleMode(camera, [
+    {event: "mousemove", listener: handleHoverOverHead},
+    {event: "mousedown", listener: handleClickOnHead},
+  ]);
+
   // const conversationMode = new ConversationMode(camera);
   modeManager.switchTo(idleMode);
 

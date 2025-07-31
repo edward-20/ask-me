@@ -2,62 +2,21 @@ import * as THREE from "three";
 import type { Mode } from "../mode";
 import { typeWord } from "../typing";
 
+interface EventListener {
+  event: "mousedown" | "mousemove", // maybe include other mouse events
+  listener: (event: MouseEvent) => void
+}
 export class IdleMode implements Mode {
   angle = 0;
-  speed = 0.2;
+  speed = 0.1;
   radius = 3;
   camera: THREE.Camera;
-  mouse: THREE.Vector2;
-  raycaster: THREE.Raycaster;
-  scene: THREE.Scene;
+  eventListeners: EventListener[];
 
-  constructor(camera : THREE.Camera, mouse: THREE.Vector2, raycaster: THREE.Raycaster, scene: THREE.Scene) {
+  constructor(camera : THREE.Camera, eventListeners: EventListener[]) {
     this.camera = camera;
-    this.mouse = mouse;
-    this.raycaster = raycaster;
-    this.scene = scene;
+    this.eventListeners = eventListeners;
   }
-
-  _getIntersection(
-    mouseevent: MouseEvent, mouse: THREE.Vector2, camera : THREE.Camera, 
-    raycaster: THREE.Raycaster, 
-    scene: THREE.Scene
-  ) {
-
-    const event = mouseevent;
-    // normalize mouse coordinates
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-
-    // check intersections with scene children
-    return raycaster.intersectObjects(scene.children, true);
-  }
-
-  handleHoverOverHead(mouseEvent: MouseEvent) {
-    const intersection = this._getIntersection(mouseEvent, this.mouse, this.camera, this.raycaster, this.scene)
-    let thereIsHitbox = false;
-    for (let i = 0; i < intersection.length; i++) {
-      const object = intersection[i].object;
-      if (object.userData.interactive) {
-        thereIsHitbox = true;
-      }
-    }
-    document.body.style.cursor = thereIsHitbox ? 'pointer' : 'default';
-  }
-
-  handleClickOnHead(mouseEvent: MouseEvent) {
-    const intersection = this._getIntersection(mouseEvent, this.mouse, this.camera, this.raycaster, this.scene)
-    for (let i = 0; i < intersection.length; i++) {
-      const object = intersection[i].object;
-      if (object.userData.interactive) {
-        // go to conversation mode
-      }
-    }
-
-  }
-
 
   init() {
     /* 
@@ -71,9 +30,11 @@ export class IdleMode implements Mode {
     divElement.className = "info";
     document.body.appendChild(divElement);
     typeWord("Click on me to start asking questions", document.getElementsByClassName("info")[0]);
+    console.log(this.eventListeners);
+    this.eventListeners.forEach((eventListener) => {
+      document.addEventListener(eventListener.event, eventListener.listener)
+    })
 
-    window.addEventListener('mousemove', this.handleHoverOverHead.bind(this), false);
-    window.addEventListener('mousedown', this.handleClickOnHead.bind(this), false)
     return;
   }
 
@@ -96,8 +57,9 @@ export class IdleMode implements Mode {
     document.getElementsByClassName("info")[0].remove();
 
     // removing event listeners
-    document.removeEventListener("mousedown", this.handleClickOnHead);
-    document.removeEventListener("mouseover", this.handleClickOnHead);
+    this.eventListeners.forEach((eventListener) => {
+      document.removeEventListener(eventListener.event, eventListener.listener)
+    })
     return;
   }
 }

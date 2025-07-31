@@ -1,4 +1,3 @@
-// clear current mode and set to conversation mode
 
 // stop the animation
 // remove event listeners for mouse move and mouse down
@@ -11,7 +10,7 @@ export default function conversation() {
 
 /* below code involves some actions needed to go to conversation mode */
 
-      // go to focus mode    
+      // go to focus mode
       shouldPan = false;
       gsap.to(camera.position, {
         duration: 2,
