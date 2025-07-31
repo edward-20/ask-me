@@ -7,6 +7,7 @@ import raycasterInit from './raycaster';
 
 import { ModeManager } from './mode';
 import { IdleMode } from './modes/idle';
+import { ConversationMode } from './modes/conversation';
 
 function main() {
   const { scene, camera, renderer } = init();
@@ -62,7 +63,7 @@ function main() {
       const object = intersection[i].object;
       if (object.userData.interactive) {
         // go to conversation mode
-        // modeManager.switchTo(conversationMode);
+        modeManager.switchTo(conversationMode);
       }
     }
   }
@@ -72,6 +73,7 @@ function main() {
     {event: "mousemove", listener: handleHoverOverHead},
     {event: "mousedown", listener: handleClickOnHead},
   ]);
+  const conversationMode = new ConversationMode(camera, []);
 
   // const conversationMode = new ConversationMode(camera);
   modeManager.switchTo(idleMode);

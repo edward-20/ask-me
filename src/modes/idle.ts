@@ -1,11 +1,8 @@
 import * as THREE from "three";
 import type { Mode } from "../mode";
 import { typeWord } from "../typing";
+import type { EventListener } from "../eventListener";
 
-interface EventListener {
-  event: "mousedown" | "mousemove", // maybe include other mouse events
-  listener: (event: MouseEvent) => void
-}
 export class IdleMode implements Mode {
   angle = 0;
   speed = 0.1;
@@ -30,7 +27,6 @@ export class IdleMode implements Mode {
     divElement.className = "info";
     document.body.appendChild(divElement);
     typeWord("Click on me to start asking questions", document.getElementsByClassName("info")[0]);
-    console.log(this.eventListeners);
     this.eventListeners.forEach((eventListener) => {
       document.addEventListener(eventListener.event, eventListener.listener)
     })
