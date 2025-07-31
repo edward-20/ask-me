@@ -57,6 +57,8 @@ button {
   transform: translateX(-50%);
   text-align: center;
   border-style: double;
+  border-radius: 20px;
+  width: 50ch;
 }
 
 button:hover {
