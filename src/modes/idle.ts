@@ -56,6 +56,7 @@ export class IdleMode implements Mode {
     this.eventListeners.forEach((eventListener) => {
       document.removeEventListener(eventListener.event, eventListener.listener)
     })
+    document.body.style.cursor = 'default';
     return;
   }
 }
