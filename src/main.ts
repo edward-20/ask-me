@@ -73,7 +73,14 @@ function main() {
     {event: "mousemove", listener: handleHoverOverHead},
     {event: "mousedown", listener: handleClickOnHead},
   ]);
-  const conversationMode = new ConversationMode(camera, []);
+
+  function handleClickOnExit() {
+    modeManager.switchTo(idleMode);
+  }
+
+  const conversationMode = new ConversationMode(camera, [
+    {event: "mousedown", listener: handleClickOnExit},
+  ]);
 
   // const conversationMode = new ConversationMode(camera);
   modeManager.switchTo(idleMode);
