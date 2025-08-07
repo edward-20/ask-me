@@ -61,12 +61,16 @@ button {
   width: 50ch;
 }
 
+.exit {
+  position: absolute;
+  top: 0;
+  right: 0;
+  aspect-ratio: 1/1;
+  width: 1ch;
+}
+
 button:hover {
   border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
