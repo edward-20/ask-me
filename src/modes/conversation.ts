@@ -6,7 +6,8 @@ import gsap from "gsap";
 import type { Mode } from "../mode";
 import { typeWord } from "../typing";
 import type { EventListener } from "../eventListener";
-import { div } from "three/tsl";
+import { html } from "htm/preact";
+import { render } from "preact";
 
 export class ConversationMode implements Mode {
   camera: THREE.Camera;
@@ -27,22 +28,6 @@ export class ConversationMode implements Mode {
         this.camera.lookAt(0,0,0);
       }
     })
-    // use babel here?
-    const divElement = document.createElement('div');
-    divElement.className = "info";
-    document.body.appendChild(divElement);
-
-    const span = document.createElement("span");
-    span.className = "message";
-
-    const exitButton = document.createElement("button")
-    exitButton.textContent = "x";
-    exitButton.className = "exit"
-    
-
-    divElement.appendChild(exitButton);
-    divElement.appendChild(span);
-    typeWord("Hi, what would you like to know about me?", document.getElementsByClassName("message")[0]);
 
     fetch("http://localhost:5000/")
     .then((response) => {
@@ -52,16 +37,13 @@ export class ConversationMode implements Mode {
       return response.json(); // Parse JSON body
     })
     .then((data : { question: string, answer: string }[]) => {
-      console.log(data);
-      const questionBoxes = data.map(qa => {
-        const div = document.createElement("div");
-        div.style.border = "black solid 1px";
-        div.textContent = qa.question;
-        return div;
-      })
-      questionBoxes.forEach((questionBox) => { divElement.append(questionBox); return; });
-      // divElement.append(question);
-      // divElement.style.border = "black";
+      const infoElement = html`<div class="info">
+        <span class="message"></span>
+        <button class="exit">x</button>
+        ${data.map(qa => html`<div class="question">${qa.question}</div>`)}
+      </div>`
+      render(infoElement, document.body);
+      typeWord("Hi, what would you like to know about me?", document.getElementsByClassName("message")[0]);
     })
     .catch((error) => {
       console.log(error);

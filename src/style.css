@@ -67,6 +67,10 @@ button {
   right: 0;
   aspect-ratio: 1/1;
   width: 1ch;
+} 
+
+.question {
+  border: solid 1px black;
 }
 
 button:hover {
