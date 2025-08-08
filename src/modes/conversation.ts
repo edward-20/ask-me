@@ -8,6 +8,7 @@ import { typeWord } from "../typing";
 import type { EventListener } from "../eventListener";
 
 export class ConversationMode implements Mode {
+  name = "Conversation";
   camera: THREE.Camera;
   eventListeners: EventListener[];
   constructor(camera : THREE.Camera, eventListeners: EventListener[]) {
@@ -47,16 +48,15 @@ export class ConversationMode implements Mode {
     .then((data : { question: string, answer: string }[]) => {
       console.log(data);
       const questionBoxes = data.map((qa, i) => {
-        const div = document.createElement("div");
-        div.style.border = "black solid 1px";
+        const questionButton = document.createElement("button");
+        questionButton.className = "question";
         const generatedId = `question${i}`;
-        div.id = generatedId;
-        // div.textContent = qa.question;
-        return {div, text: {question: qa.question, answer: qa.answer}};
+        questionButton.id = generatedId;
+        return {domNode: questionButton, text: {question: qa.question, answer: qa.answer}};
       })
       questionBoxes.forEach((questionBox) => { 
-        divElement.append(questionBox.div);
-        typeWord(questionBox.text.question, questionBox.div)
+        divElement.append(questionBox.domNode);
+        typeWord(`>${questionBox.text.question}`, questionBox.domNode)
       });
     })
     .catch((error) => {

@@ -4,6 +4,7 @@ import { typeWord } from "../typing";
 import type { EventListener } from "../eventListener";
 
 export class IdleMode implements Mode {
+  name = "Idle";
   angle = 0;
   speed = 0.1;
   radius = 3;

@@ -65,12 +65,27 @@ button {
   position: absolute;
   top: 0;
   right: 0;
-  aspect-ratio: 1/1;
-  width: 1ch;
+  display: flex;
+  justify-content: center;
+  border-radius: inherit;
+}
+
+.info {
+  text-align: left;
+}
+
+.question {
+  border: unset;
+  border-radius: unset;
+  width: 100%;
+  text-align: left;
+}
+.question:hover {
+  border: solid 1px black;
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: black;
 }
 
 @media (prefers-color-scheme: light) {
@@ -82,6 +97,6 @@ button:hover {
     color: #747bff;
   }
   button {
-    background-color: #f9f9f9;
+    background-color: white;
   }
 }

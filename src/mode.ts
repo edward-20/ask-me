@@ -1,4 +1,5 @@
 export interface Mode {
+  name: string,
   init(): void,
   update(delta: number): void,
   dispose(): void,
@@ -9,6 +10,7 @@ export class ModeManager {
 
   switchTo(mode: Mode) {
     if (this.currentMode) {
+      console.log("switched mode to: ", mode.name)
       this.currentMode.dispose();
     }
     this.currentMode = mode;

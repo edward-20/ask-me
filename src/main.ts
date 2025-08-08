@@ -64,6 +64,7 @@ function main() {
       if (object.userData.interactive) {
         // go to conversation mode
         modeManager.switchTo(conversationMode);
+        return;
       }
     }
   }
