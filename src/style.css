@@ -35,16 +35,9 @@ body {
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  all: unset;
+  font: inherit;
   cursor: pointer;
-  transition: border-color 0.25s;
-  z-index: 99;
 }
 
 .info {
@@ -62,19 +55,25 @@ button {
 }
 
 .exit {
-  position: absolute;
-  top: 0;
-  right: 0;
-  aspect-ratio: 1/1;
-  width: 1ch;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
 } 
 
-.question {
-  border: solid 1px black;
+.message {
+  text-align: left;
+  padding: 0.5rem 1rem;
+  padding: 0.5rem 0;
 }
 
-button:hover {
-  border-color: #646cff;
+.question {
+  text-align: left;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.question:hover {
+  border: solid 1px black;
 }
 
 @media (prefers-color-scheme: light) {

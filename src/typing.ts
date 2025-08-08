@@ -1,3 +1,6 @@
+import { useRef, useEffect } from "preact/hooks";
+import { html } from "htm/preact";
+
 export function clearContent(htmlElement: Element) {
   htmlElement.textContent = "";
 }
@@ -16,4 +19,17 @@ export function typeWord(text: string, htmlElement: Element) {
       clearInterval(interval);
     }
   }, 50);
+}
+export function Typewriter({ text, className } : { text: string, className: string }) {
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (spanRef.current) {
+      spanRef.current.textContent = ""; // Clear initial content
+      spanRef.current.className = className;
+      typeWord(text, spanRef.current);
+    }
+  }, [text]);
+
+  return html`<span ref=${spanRef}></span>`;
 }
