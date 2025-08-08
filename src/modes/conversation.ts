@@ -6,7 +6,6 @@ import gsap from "gsap";
 import type { Mode } from "../mode";
 import { typeWord } from "../typing";
 import type { EventListener } from "../eventListener";
-import { div } from "three/tsl";
 
 export class ConversationMode implements Mode {
   camera: THREE.Camera;
@@ -27,21 +26,15 @@ export class ConversationMode implements Mode {
         this.camera.lookAt(0,0,0);
       }
     })
-    // use babel here?
+    // use innerHTML
     const divElement = document.createElement('div');
     divElement.className = "info";
     document.body.appendChild(divElement);
-
-    const span = document.createElement("span");
-    span.className = "message";
-
-    const exitButton = document.createElement("button")
-    exitButton.textContent = "x";
-    exitButton.className = "exit"
     
-
-    divElement.appendChild(exitButton);
-    divElement.appendChild(span);
+    divElement.innerHTML = `
+      <span class="message"></span>
+      <button class="exit">x</button>
+    `
     typeWord("Hi, what would you like to know about me?", document.getElementsByClassName("message")[0]);
 
     fetch("http://localhost:5000/")
@@ -53,15 +46,18 @@ export class ConversationMode implements Mode {
     })
     .then((data : { question: string, answer: string }[]) => {
       console.log(data);
-      const questionBoxes = data.map(qa => {
+      const questionBoxes = data.map((qa, i) => {
         const div = document.createElement("div");
         div.style.border = "black solid 1px";
-        div.textContent = qa.question;
-        return div;
+        const generatedId = `question${i}`;
+        div.id = generatedId;
+        // div.textContent = qa.question;
+        return {div, text: {question: qa.question, answer: qa.answer}};
       })
-      questionBoxes.forEach((questionBox) => { divElement.append(questionBox); return; });
-      // divElement.append(question);
-      // divElement.style.border = "black";
+      questionBoxes.forEach((questionBox) => { 
+        divElement.append(questionBox.div);
+        typeWord(questionBox.text.question, questionBox.div)
+      });
     })
     .catch((error) => {
       console.log(error);
