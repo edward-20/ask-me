@@ -75,7 +75,7 @@ function main() {
     {event: "mousedown", listener: handleClickOnHead},
   ]);
 
-  function handleClickOnExit() {
+  function handleClickOnExit(event: MouseEvent) {
     modeManager.switchTo(idleMode);
   }
 

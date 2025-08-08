@@ -64,7 +64,10 @@ export class ConversationMode implements Mode {
     })
 
     this.eventListeners.forEach((eventListener) => {
-      document.addEventListener(eventListener.event, eventListener.listener)
+      // this is a kludge, we should be somehow taking the list of eventListeners and finding the one that's relevant to the exitButton
+      if (eventListener.event === "mousedown") { // handling exit attempt
+        (document.getElementsByClassName("exit")[0] as HTMLElement).addEventListener(eventListener.event, eventListener.listener)
+      }
     })
   }
 
