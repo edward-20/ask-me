@@ -74,12 +74,17 @@ button {
   text-align: left;
 }
 
+.message {
+  text-decoration: underline;
+}
+
 .question {
   border: unset;
   border-radius: unset;
   width: 100%;
   text-align: left;
 }
+
 .question:hover {
   border: solid 1px black;
 }

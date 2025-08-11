@@ -47,6 +47,7 @@ export class ConversationMode implements Mode {
     })
     .then((data : { question: string, answer: string }[]) => {
       console.log(data);
+      // create array of objects containing the dom node for the question and the question data
       const questionBoxes = data.map((qa, i) => {
         const questionButton = document.createElement("button");
         questionButton.className = "question";
@@ -55,8 +56,30 @@ export class ConversationMode implements Mode {
         return {domNode: questionButton, text: {question: qa.question, answer: qa.answer}};
       })
       questionBoxes.forEach((questionBox) => { 
+        // for each of the objects in the array 
+        // attach the DOM node and type out the question 
         divElement.append(questionBox.domNode);
         typeWord(`>${questionBox.text.question}`, questionBox.domNode)
+        // add an event listener to each button
+        questionBox.domNode.addEventListener("click", (event) => {
+          // before changing the state of something, clear all current attempts to finish typing words
+          typeWord.intervals.forEach((intervalId) => {
+            clearInterval(intervalId);
+          })
+          // change the message to the question and type it
+          const message = document.getElementsByClassName("message")[0]
+          message.textContent = "";
+          typeWord(questionBox.text.question, message);
+          // remove all other question class DOM elements
+          Array.from(document.getElementsByClassName("question")).forEach(element => {
+            element.remove();
+          });
+          const answer = document.createElement("div");
+          answer.className = "answer";
+          const info = document.getElementsByClassName("info")[0];
+          info.appendChild(answer);
+          typeWord(questionBox.text.answer, answer);
+        })
       });
     })
     .catch((error) => {

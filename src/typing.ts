@@ -1,7 +1,14 @@
 export function clearContent(htmlElement: Element) {
   htmlElement.textContent = "";
 }
-export function typeWord(text: string, htmlElement: Element) {
+
+export type typeWord = {
+  (text: string, htmlElement: Element): void,
+  intervals: number[]
+}
+
+const typeWord = ((text: string, htmlElement: Element) =>
+{
   // let i = 0;
   // setInterval(() => {
   //   htmlElement.textContent += text[i];
@@ -15,5 +22,13 @@ export function typeWord(text: string, htmlElement: Element) {
     if (i >= text.length) {
       clearInterval(interval);
     }
-  }, 50);
-}
+  }, 25);
+
+  if (typeWord.intervals) {
+    typeWord.intervals.push(interval)
+  } else {
+    typeWord.intervals = [];
+  }
+}) as typeWord;
+
+export { typeWord };
