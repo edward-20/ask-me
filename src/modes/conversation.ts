@@ -16,57 +16,6 @@ export class ConversationMode implements Mode {
     this.eventListeners = eventListeners;
   }
 
-  _showQuestions(container: HTMLElement) {
-    fetch("http://localhost:5000/")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json(); // Parse JSON body
-    })
-    .then((data : { question: string, answer: string }[]) => {
-      console.log(data);
-      // create array of objects containing the dom node for the question and the question data
-      const questionBoxes = data.map((qa, i) => {
-        const questionButton = document.createElement("button");
-        questionButton.className = "question";
-        const generatedId = `question${i}`;
-        questionButton.id = generatedId;
-        return {domNode: questionButton, text: {question: qa.question, answer: qa.answer}};
-      })
-      questionBoxes.forEach((questionBox) => { 
-        // for each of the objects in the array 
-        // attach the DOM node and type out the question 
-        container.append(questionBox.domNode);
-        typeWord(`>${questionBox.text.question}`, questionBox.domNode)
-        // add an event listener to each button
-        questionBox.domNode.addEventListener("click", (event) => {
-          // before changing the state of something, clear all current attempts to finish typing words
-          typeWord.intervals.forEach((intervalId) => {
-            clearInterval(intervalId);
-          })
-          // change the message to the question and type it
-          const message = document.getElementsByClassName("message")[0]
-          message.textContent = "";
-          typeWord(questionBox.text.question, message);
-          // remove all other question class DOM elements
-          Array.from(document.getElementsByClassName("question")).forEach(element => {
-            element.remove();
-          });
-          const answer = document.createElement("div");
-          answer.className = "answer";
-          const info = document.getElementsByClassName("info")[0];
-          info.appendChild(answer);
-          typeWord(questionBox.text.answer, answer);
-        })
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-
-
-  }
   init() {
     gsap.to(this.camera.position, {
       duration: 2,
@@ -89,7 +38,65 @@ export class ConversationMode implements Mode {
     `
     typeWord("Hi, what would you like to know about me?", document.getElementsByClassName("message")[0]);
 
-    this._showQuestions(divElement);
+    function _showQuestions() {
+      fetch("http://localhost:5000/")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); // Parse JSON body
+      })
+      .then((data : { question: string, answer: string }[]) => {
+        // remove all current existing questionBoxes
+        // create array of objects containing the dom node for the question and the question data
+        const questionBoxes = data.map((qa, i) => {
+          const questionButton = document.createElement("button");
+          questionButton.className = "question";
+          const generatedId = `question${i}`;
+          questionButton.id = generatedId;
+          return {domNode: questionButton, text: {question: qa.question, answer: qa.answer}};
+        })
+        questionBoxes.forEach((questionBox) => { 
+          // for each of the objects in the array 
+          // attach the DOM node and type out the question 
+          divElement.append(questionBox.domNode);
+          typeWord(`>${questionBox.text.question}`, questionBox.domNode)
+          // add an event listener to each button
+          questionBox.domNode.addEventListener("click", (event) => {
+            // before changing the state of something, clear all current attempts to finish typing words
+            typeWord.intervals.forEach((intervalId) => {
+              clearInterval(intervalId);
+            })
+            // change the message to the question and type it
+            const message = document.getElementsByClassName("message")[0];
+            message.textContent = "";
+            typeWord(questionBox.text.question, message);
+            // remove previous answer (happens in the case where we invoke _showQuestions after the 1st time)
+            const priorAnswer = document.getElementsByClassName("answer");
+            if (priorAnswer.length > 0) priorAnswer[0].remove();
+            // remove all other question class DOM elements
+            Array.from(document.getElementsByClassName("question")).forEach(element => {
+              element.remove();
+            });
+            const answer = document.createElement("div");
+            answer.className = "answer";
+            const info = document.getElementsByClassName("info")[0];
+            info.appendChild(answer);
+            typeWord(questionBox.text.answer, answer, () => {
+              // clear
+              _showQuestions();
+            });
+          })
+
+          // add a next question button, or check that the interval of typing the answer has finished
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+    }
+
+    _showQuestions();
 
     this.eventListeners.forEach((eventListener) => {
       // this is a kludge, we should be somehow taking the list of eventListeners and finding the one that's relevant to the exitButton

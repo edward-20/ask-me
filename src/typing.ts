@@ -3,11 +3,11 @@ export function clearContent(htmlElement: Element) {
 }
 
 export type typeWord = {
-  (text: string, htmlElement: Element): void,
+  (text: string, htmlElement: Element, callbackFn?: () => void): void,
   intervals: number[]
 }
 
-const typeWord = ((text: string, htmlElement: Element) =>
+const typeWord = ((text: string, htmlElement: Element, callbackFn?: () => void) =>
 {
   // let i = 0;
   // setInterval(() => {
@@ -21,6 +21,8 @@ const typeWord = ((text: string, htmlElement: Element) =>
 
     if (i >= text.length) {
       clearInterval(interval);
+      if (callbackFn)
+      setTimeout(callbackFn, 1000);
     }
   }, 25);
 
