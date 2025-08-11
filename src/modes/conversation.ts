@@ -16,28 +16,7 @@ export class ConversationMode implements Mode {
     this.eventListeners = eventListeners;
   }
 
-  init() {
-    gsap.to(this.camera.position, {
-      duration: 2,
-      x: 0,
-      y: 0,
-      z: -2,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        this.camera.lookAt(0,0,0);
-      }
-    })
-    // use innerHTML
-    const divElement = document.createElement('div');
-    divElement.className = "info";
-    document.body.appendChild(divElement);
-    
-    divElement.innerHTML = `
-      <span class="message"></span>
-      <button class="exit">x</button>
-    `
-    typeWord("Hi, what would you like to know about me?", document.getElementsByClassName("message")[0]);
-
+  _showQuestions(container: HTMLElement) {
     fetch("http://localhost:5000/")
     .then((response) => {
       if (!response.ok) {
@@ -58,7 +37,7 @@ export class ConversationMode implements Mode {
       questionBoxes.forEach((questionBox) => { 
         // for each of the objects in the array 
         // attach the DOM node and type out the question 
-        divElement.append(questionBox.domNode);
+        container.append(questionBox.domNode);
         typeWord(`>${questionBox.text.question}`, questionBox.domNode)
         // add an event listener to each button
         questionBox.domNode.addEventListener("click", (event) => {
@@ -85,6 +64,32 @@ export class ConversationMode implements Mode {
     .catch((error) => {
       console.log(error);
     })
+
+
+  }
+  init() {
+    gsap.to(this.camera.position, {
+      duration: 2,
+      x: 0,
+      y: 0,
+      z: -2,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        this.camera.lookAt(0,0,0);
+      }
+    })
+    // use innerHTML
+    const divElement = document.createElement('div');
+    divElement.className = "info";
+    document.body.appendChild(divElement);
+    
+    divElement.innerHTML = `
+      <span class="message"></span>
+      <button class="exit">x</button>
+    `
+    typeWord("Hi, what would you like to know about me?", document.getElementsByClassName("message")[0]);
+
+    this._showQuestions(divElement);
 
     this.eventListeners.forEach((eventListener) => {
       // this is a kludge, we should be somehow taking the list of eventListeners and finding the one that's relevant to the exitButton
